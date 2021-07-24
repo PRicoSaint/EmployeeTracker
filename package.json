@@ -1,0 +1,25 @@
+{
+  "name": "EmployeeTracker",
+  "version": "1.0.0",
+  "description": "This is a command line application that will serve as an employee database for the a company. It makes use of inquirer and mysql2 packages to meet the requirements for this project.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PRicoSaint/EmployeeTracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PRicoSaint/EmployeeTracker/issues"
+  },
+  "homepage": "https://github.com/PRicoSaint/EmployeeTracker#readme",
+  "dependencies": {
+    "inquirer": "^8.1.2",
+    "mysql2": "^2.2.5"
+  }
+}
