@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const express = require('express');
 // Import and require mysql2
 const mysql = require('mysql2');
+const { response } = require('express');
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3001;
@@ -21,6 +22,215 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employee_db database.`)
 );
+
+inquirer.prompt([
+  {
+      type: 'list',
+      message: "==============================\n====== EMPLOYEE DATABASE ======\n==============================\n\n Please select one of the following options:",
+      name: 'option',
+      choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update employee role", "Quit"],
+  }
+])
+.then((response) => {
+  let choice = response.option;
+  nextOperation(choice)
+
+});
+
+
+
+
+function nextOperation(choice){
+  switch (choice){
+      case "View all departments":
+          console.log("You have chosen to view all departments.")
+      // Show departments table
+        db.query(`SELECT * FROM department`, (err, rows) => {
+          if (err){
+            console.log(err.message);
+            return;
+          }else{
+            console.log(rows);
+          }
+        });
+      optionsScreen();
+      break;
+      case "View all roles":
+        console.log("You have chosen to view all roles.")
+      // Show roles table
+      db.query(`SELECT * FROM current_role`, (err, rows) => {
+        if (err){
+          console.log(err.message);
+          return;
+        }else{
+          console.log(rows);
+        }
+      });
+      optionsScreen();
+      break;
+      case "View all employees":
+        console.log("You have chosen to view all employees.")
+      //  Show employee table
+      db.query(`SELECT * FROM employee`, (err, rows) => {
+        if (err){
+          console.log(err.message);
+          return;
+        }else{
+          console.log(rows);
+        }
+      });
+      optionsScreen();
+      break;
+      case "Add a department":
+        console.log("You have chosen to add a department.")
+        // Insert value into department table
+        addDepartment();
+      optionsScreen();
+      break;
+      case "Add a role":
+        console.log("You have chosen to add a role.")
+        // Insert value into role table
+        addRole();
+      optionsScreen();
+      break;
+      case "Add an employee":
+        console.log("You have chosen to add an employee.")
+        // Insert value into employee table
+        addEmployee();
+      optionsScreen();
+      break;
+      case "Update employee role":
+        console.log("You have chosen to update an employee's role.")
+        // Modify value in table
+      optionsScreen();
+      break;
+      case "Quit":
+        console.log("Good-bye!")
+        // quit program
+      break;
+  }
+
+}
+
+
+function optionsScreen(){
+  inquirer.prompt([
+    {
+        type: 'list',
+        message: "Please select one of the following options:",
+        name: 'option',
+        choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update employee role", "Quit"],
+    }
+  ])
+  .then((response) => {
+    let choice = response.option;
+    nextOperation(choice)
+  
+  });
+
+};
+
+function addDepartment(){
+  inquirer.prompt([
+    {
+      type:'input',
+      message:"Enter department name",
+      name: 'department_name',
+
+  }
+  ])
+  .then((response) => {
+    let newDepartment = response.department_name;
+    db.query(`INSERT INTO department (department_name) VALUES (${newDepartment})`, (err, result) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log("New department has been successfully added!")
+      console.log(result);
+    });
+  
+  });
+};
+
+function addRole(){
+  inquirer.prompt([
+    {
+      type:'input',
+      message:"Enter new role name",
+      name: 'role_name',
+
+  },
+  {
+    type:'input',
+        message:"What will the annual salary be?",
+        name: 'salary',
+        validate(value) {
+            const valid = !isNaN(parseFloat(value));
+            return valid || 'Please enter a number';
+          },
+          filter: Number,
+
+}
+  ])
+  .then((response) => {
+    let newRole = response.role_name;
+    let newSalary = response.salary;
+    db.query(`INSERT INTO current_role (title, salary) VALUES (${newRole}, ${newSalary})`, (err, result) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log("New role has been successfully added!")
+      console.log(result);
+    });
+  
+  });
+};
+function addEmployee(){
+  inquirer.prompt([
+    {
+      type:'input',
+      message:"Enter Employee's first name",
+      name: 'firstName',
+
+  },
+  {
+    type:'input',
+    message:"Enter Employee's last name",
+    name: 'lastName',
+
+  },
+  {
+    type:'input',
+        message:"Who will the manager be?",
+        name: 'manager',
+        validate(value) {
+            const valid = !isNaN(parseFloat(value));
+            return valid || 'Please enter a number';
+          },
+          filter: Number,
+
+}
+  ])
+  .then((response) => {
+    let firstName = response.firstName;
+    let lastName = response.lastName;
+    let manager = response.manager;
+    db.query(`INSERT INTO employee (first_name, last_name, manager_id) VALUES (${firstName}, ${lastName}, ${manager})`, (err, result) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log("New role has been successfully added!")
+      console.log(result);
+    });
+  
+  });
+};
+
+
+
 
 
 app.listen(PORT, () => {
