@@ -84,20 +84,17 @@ function nextOperation(choice){
       case "Add a department":
         console.log("You have chosen to add a department.")
         // Insert value into department table
-        addDepartment();
-      optionsScreen();
+        addDepartment()
       break;
       case "Add a role":
         console.log("You have chosen to add a role.")
         // Insert value into role table
-        addRole();
-      optionsScreen();
+        addRole()
       break;
       case "Add an employee":
         console.log("You have chosen to add an employee.")
         // Insert value into employee table
-        addEmployee();
-      optionsScreen();
+        addEmployee()
       break;
       case "Update employee role":
         console.log("You have chosen to update an employee's role.")
@@ -141,15 +138,15 @@ function addDepartment(){
   ])
   .then((response) => {
     let newDepartment = response.department_name;
-    db.query(`INSERT INTO department (department_name) VALUES (${newDepartment})`, (err, result) => {
+    db.query(`INSERT INTO department (department_name) VALUES ("${newDepartment}");`, (err, result) => {
       if (err) {
         console.log(err);
         return;
       }
       console.log("New department has been successfully added!")
-      console.log(result);
     });
-  
+  optionsScreen();
+    
   });
 };
 
@@ -176,15 +173,14 @@ function addRole(){
   .then((response) => {
     let newRole = response.role_name;
     let newSalary = response.salary;
-    db.query(`INSERT INTO current_role (title, salary) VALUES (${newRole}, ${newSalary})`, (err, result) => {
+    db.query(`INSERT INTO current_role (title, salary) VALUES ("${newRole}", ${newSalary});`, (err, result) => {
       if (err) {
         console.log(err);
         return;
       }
       console.log("New role has been successfully added!")
-      console.log(result);
     });
-  
+    optionsScreen();
   });
 };
 function addEmployee(){
@@ -217,15 +213,15 @@ function addEmployee(){
     let firstName = response.firstName;
     let lastName = response.lastName;
     let manager = response.manager;
-    db.query(`INSERT INTO employee (first_name, last_name, manager_id) VALUES (${firstName}, ${lastName}, ${manager})`, (err, result) => {
+    db.query(`INSERT INTO employee (first_name, last_name, manager_id) VALUES ("${firstName}", "${lastName}", ${manager});`, (err, result) => {
       if (err) {
         console.log(err);
         return;
       }
       console.log("New role has been successfully added!")
-      console.log(result);
     });
-  
+  optionsScreen();
+    
   });
 };
 
