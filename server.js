@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const express = require('express');
+const cTable = require('console.table');
 // Import and require mysql2
 const mysql = require('mysql2');
 const { response } = require('express');
@@ -50,7 +51,7 @@ function nextOperation(choice){
             console.log(err.message);
             return;
           }else{
-            console.log(rows);
+            console.table("Departments",rows);
           }
         });
       optionsScreen();
@@ -63,7 +64,7 @@ function nextOperation(choice){
           console.log(err.message);
           return;
         }else{
-          console.log(rows);
+          console.table("Roles", rows);
         }
       });
       optionsScreen();
@@ -76,7 +77,7 @@ function nextOperation(choice){
           console.log(err.message);
           return;
         }else{
-          console.log(rows);
+          console.table("Employees", rows);
         }
       });
       optionsScreen();
@@ -99,7 +100,7 @@ function nextOperation(choice){
       case "Update employee role":
         console.log("You have chosen to update an employee's role.")
         // Modify value in table
-      optionsScreen();
+      updateEmployee();
       break;
       case "Quit":
         console.log("Good-bye!")
@@ -225,9 +226,57 @@ function addEmployee(){
   });
 };
 
+function updateEmployee(){
+  var options = [];
+  db.query(`SELECT Concat(first_name, ' ', last_name)AS Employee FROM employee ORDER BY first_name;`, (err, result)=>{
+  if (err) {
+    console.log(err);
+    return;
+  }
+  options.push(result);
+  console.log(options);
+  // look up .map method
+  
 
 
 
+  });
+  
+  inquirer.prompt([
+    {
+      type:'list',
+      message:"Choose Employee to update",
+      name: 'employee_name',
+      choices: options[0],
+
+  }
+
+  ])
+  .then((response) => {
+    // let newRole = response.role;
+    let employeeToUpdate = response.employee_name;
+    db.query( // UPDATE employeeToUpdate
+      // SET role = "strawberry"
+      // WHERE ----split name into first_name and last_name and match to
+      ` `, (err, result) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log("Employee has been sucessfully updated!")
+    });
+  optionsScreen();
+    
+  });
+
+
+}
+
+function list(choices){
+  for (i=1; i > choices.length; i++){
+    return choices[i];
+  }
+}
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
