@@ -46,7 +46,7 @@ function nextOperation(choice){
       case "View all departments":
           console.log("You have chosen to view all departments.")
       // Show departments table
-        db.query(`SELECT * FROM department`, (err, rows) => {
+        db.query(`SELECT department.department_name AS Departments FROM department;`, (err, rows) => {
           if (err){
             console.log(err.message);
             return;
@@ -59,7 +59,7 @@ function nextOperation(choice){
       case "View all roles":
         console.log("You have chosen to view all roles.")
       // Show roles table
-      db.query(`SELECT * FROM current_role`, (err, rows) => {
+      db.query(`SELECT current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department FROM current_role JOIN department ON current_role.department_id = department.id;`, (err, rows) => {
         if (err){
           console.log(err.message);
           return;
@@ -72,7 +72,7 @@ function nextOperation(choice){
       case "View all employees":
         console.log("You have chosen to view all employees.")
       //  Show employee table
-      db.query(`SELECT * FROM employee`, (err, rows) => {
+      db.query(`SELECT employee.first_name AS First, employee.last_name AS Last, current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department FROM employee JOIN current_role ON employee.current_role_id = current_role.id JOIN department ON current_role.department_id = department.id;`, (err, rows) => {
         if (err){
           console.log(err.message);
           return;
@@ -281,7 +281,8 @@ function updateEmployee(){
       db.query( // UPDATE employee
       // SET title = ${newRole}
       // WHERE first_name = ${firstName}
-      `UPDATE employee SET title = ${newRole} WHERE first_name = ${firstName};`, (err, result) => {
+      // UPDATE employee SET title = "Agent" WHERE first_name = "Cyril";
+      `UPDATE employee SET title = "${newRole}" WHERE first_name = "${firstName}";`, (err, result) => {
       if (err) {
         console.log(err);
         return;
