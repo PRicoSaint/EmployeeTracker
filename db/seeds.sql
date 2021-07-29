@@ -1,6 +1,5 @@
 USE employee_db;
--- seed tables with initial values matching the corresponding table(for role and employee)
--- Use join to show the corresponding valye for the foreign key id
+-- Use join to show the corresponding value for the foreign key id
 INSERT INTO department (department_name)
 VALUES ("Field Ops"),
         ("Owner"),

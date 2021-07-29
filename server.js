@@ -227,50 +227,97 @@ function addEmployee(){
 };
 
 function updateEmployee(){
-  var options = [];
-  db.query(`SELECT Concat(first_name, ' ', last_name)AS Employee FROM employee ORDER BY first_name;`, (err, result)=>{
+  var employee = [];
+  var newRole=[];
+  db.query(`SELECT GROUP_Concat(first_name, ' ', last_name) AS choices FROM employee ORDER BY first_name;`, (err, result)=>{
   if (err) {
     console.log(err);
     return;
   }
-  options.push(result);
-  console.log(options);
-  // look up .map method
-  
+  let array = Object.values(JSON.parse(JSON.stringify(result)));
+   let options = array[0].choices;
+   const myOptions = JSON.stringify(options);
+   const lastChange = myOptions.replace(/['"]+/g, '');
+   const finalOptions = lastChange.split(",");
 
-
-
-  });
-  
   inquirer.prompt([
     {
       type:'list',
       message:"Choose Employee to update",
       name: 'employee_name',
-      choices: options[0],
-
+      choices: finalOptions,
   }
 
   ])
   .then((response) => {
-    // let newRole = response.role;
-    let employeeToUpdate = response.employee_name;
-    db.query( // UPDATE employeeToUpdate
-      // SET role = "strawberry"
-      // WHERE ----split name into first_name and last_name and match to
-      ` `, (err, result) => {
+    employee = response.employee_name;
+    db.query(`SELECT GROUP_CONCAT(title) as choices FROM current_role;`, (err, result)=>{
+      if (err) {
+        console.log(err);
+        return;
+      }
+      let array = Object.values(JSON.parse(JSON.stringify(result)));
+       let options = array[0].choices;
+       const myOptions = JSON.stringify(options);
+       const lastChange = myOptions.replace(/['"]+/g, '');
+       const finalOptions = lastChange.split(",");
+    
+      inquirer.prompt([
+        {
+          type:'list',
+          message:"Choose role for employee to assume",
+          name: 'role',
+          choices: finalOptions,
+      }
+    
+      ]).then((response) => {
+        newRole = response.role;  
+        console.log(newRole);
+        let employeesNames = employee.split(" ");
+        console.log(employeesNames);
+        let firstName = employeesNames[0];
+        console.log(firstName);
+
+      db.query( // UPDATE employee
+      // SET title = ${newRole}
+      // WHERE first_name = ${firstName}
+      `UPDATE employee SET title = ${newRole} WHERE first_name = ${firstName};`, (err, result) => {
       if (err) {
         console.log(err);
         return;
       }
       console.log("Employee has been sucessfully updated!")
     });
+
+      })
+      
+    
+    
+    })
+
+  })
+})
+    // db.query( // UPDATE employee
+    //   // SET role = "strawberry"
+    //   // WHERE ----split name into first_name and last_name and match to
+    //   ` `, (err, result) => {
+    //   if (err) {
+    //     console.log(err);
+    //     return;
+    //   }
+    //   console.log("Employee has been sucessfully updated!")
+    // });
   optionsScreen();
     
-  });
+  
 
 
-}
+
+  
+
+
+
+};
 
 function list(choices){
   for (i=1; i > choices.length; i++){
