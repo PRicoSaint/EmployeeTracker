@@ -229,6 +229,7 @@ function addEmployee(){
 function updateEmployee(){
   var employee = [];
   var newRole=[];
+  var finish = 0;
   db.query(`SELECT GROUP_Concat(first_name, ' ', last_name) AS choices FROM employee ORDER BY first_name;`, (err, result)=>{
   if (err) {
     console.log(err);
@@ -278,19 +279,45 @@ function updateEmployee(){
         let firstName = employeesNames[0];
         console.log(firstName);
 
-      db.query( // UPDATE employee
-      // SET title = ${newRole}
-      // WHERE first_name = ${firstName}
-      // UPDATE employee SET title = "Agent" WHERE first_name = "Cyril";
-      `UPDATE employee SET title = "${newRole}" WHERE first_name = "${firstName}";`, (err, result) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log("Employee has been sucessfully updated!")
-    });
-
+        // Takes id from matching role value
+        db.query( `SELECT id FROM current_role WHERE title = "${newRole}";`, (err, result) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          let array = Object.values(JSON.parse(JSON.stringify(result)));
+          finish = array[0].id;
+          console.log(finish)
+          db.query(`UPDATE employee SET current_role_id = "${finish}" WHERE first_name = "${firstName}";`, (err, result) => {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            console.log(employee + " has been sucessfully updated!");
+            optionsScreen();
+          })
+        })
+       
       })
+    //   .then(db.query( `SELECT id FROM current_role WHERE title = "${newRole}";`, (err, result) => {
+    //       if (err) {
+    //         console.log(err);
+    //         return;
+    //       }
+    //       let array = Object.values(JSON.parse(JSON.stringify(result)));
+    //       finish = array[0].id;
+    //       console.log(finish)
+
+    //     })).then(
+    //   db.query(`UPDATE employee SET current_role_id = "${finish}" WHERE first_name = "${firstName}";`, (err, result) => {
+    //   if (err) {
+    //     console.log(err);
+    //     return;
+    //   }
+    //   console.log(employee + " has been sucessfully updated!");
+    // })
+
+      // )
       
     
     
@@ -298,33 +325,10 @@ function updateEmployee(){
 
   })
 })
-    // db.query( // UPDATE employee
-    //   // SET role = "strawberry"
-    //   // WHERE ----split name into first_name and last_name and match to
-    //   ` `, (err, result) => {
-    //   if (err) {
-    //     console.log(err);
-    //     return;
-    //   }
-    //   console.log("Employee has been sucessfully updated!")
-    // });
-  optionsScreen();
+
     
-  
-
-
-
-  
-
-
-
 };
 
-function list(choices){
-  for (i=1; i > choices.length; i++){
-    return choices[i];
-  }
-}
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

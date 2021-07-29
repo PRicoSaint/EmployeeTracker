@@ -15,7 +15,8 @@ CREATE TABLE current_role (
     salary DECIMAL,
     department_id INT,
     FOREIGN KEY (department_id)
-    REFERENCES department(id),
+    REFERENCES department(id)
+    ON UPDATE CASCADE,
     PRIMARY KEY(id)
     
 );
@@ -27,7 +28,8 @@ CREATE TABLE employee (
   current_role_id INT,
   manager_id INT,
   FOREIGN KEY (current_role_id)
-  REFERENCES current_role(id),
+  REFERENCES current_role(id)
+  ON UPDATE CASCADE,
   PRIMARY KEY(id)
 
 );
