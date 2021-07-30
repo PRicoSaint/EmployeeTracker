@@ -8,7 +8,7 @@ current_role ON employee.current_role_id = current_role.id;
 
 
 -- Show all tables joined together
-SELECT employee.first_name AS First, employee.last_name AS Last, current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department FROM employee JOIN current_role ON employee.current_role_id = current_role.id JOIN department ON current_role.department_id = department.id;
+SELECT employee.first_name AS First, employee.last_name AS Last, current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department, employee.manager_id AS Manager FROM employee JOIN current_role ON employee.current_role_id = current_role.id JOIN department ON current_role.department_id = department.id JOIN employee ON employee.manager_id = employee.id;
 
 -- Show role joined with department
 SELECT current_role.title, current_role.salary, department.department_name FROM current_role JOIN department ON current_role.department_id = department.id;
