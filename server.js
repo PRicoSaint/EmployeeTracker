@@ -1,3 +1,4 @@
+// Sets up requireds modules to be loaded
 const inquirer = require("inquirer");
 const express = require("express");
 const cTable = require("console.table");
@@ -6,6 +7,7 @@ const mysql = require("mysql2");
 const { response } = require("express");
 require("dotenv").config();
 
+// Sets up port for server to listen to.
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -15,7 +17,7 @@ app.use(express.json());
 
 // Connect to database
 const db = mysql.createConnection(
-  {
+  { //CREATE .env FILE AND MAKE SURE IT IS FILLED WITH VALUES FOR DB_HOST='' ETC
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
@@ -23,7 +25,7 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employee_db database.`)
 );
-
+// Initial prompt shows the user the employee database splash and scrolling list of options to choose from
 inquirer
   .prompt([
     {
@@ -47,7 +49,7 @@ inquirer
     let choice = response.option;
     nextOperation(choice);
   });
-
+// This functions contains a switch case that matches each of the choice options.
 function nextOperation(choice) {
   switch (choice) {
     case "View all departments":
@@ -60,15 +62,17 @@ function nextOperation(choice) {
             console.log(err.message);
             return;
           } else {
+            // This will output the mysql2 data query as a nice looking table
             console.table("Departments", rows);
           }
         }
       );
+      // returns the initial options screen without splash section
       optionsScreen();
       break;
     case "View all roles":
       console.log("You have chosen to view all roles.");
-      // Show roles table
+      // Show roles table joined with departments to match department_id
       db.query(
         `SELECT current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department FROM current_role JOIN department ON current_role.department_id = department.id;`,
         (err, rows) => {
@@ -84,7 +88,7 @@ function nextOperation(choice) {
       break;
     case "View all employees":
       console.log("You have chosen to view all employees.");
-      //  Show employee table
+      //  Show employee table, joined with current_role table, department table and manager side of the employee table
       db.query(
         `SELECT employee.first_name AS First, employee.last_name AS Last, current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department, CONCAT(manager.first_name, " ", manager.last_name) AS Manager FROM employee JOIN current_role ON employee.current_role_id = current_role.id JOIN department ON current_role.department_id = department.id LEFT JOIN employee Manager ON manager.id = employee.manager_id;`,
         (err, rows) => {
@@ -115,7 +119,7 @@ function nextOperation(choice) {
       break;
     case "Update employee role":
       console.log("You have chosen to update an employee's role.");
-      // Modify value in table
+      // Modify existing employee's current role
       updateEmployee();
       break;
     case "Quit":
@@ -124,8 +128,9 @@ function nextOperation(choice) {
       break;
   }
 }
-
+// Open to see functions
 function optionsScreen() {
+  // Runs database command line interface options without splash.
   inquirer
     .prompt([
       {
@@ -151,6 +156,7 @@ function optionsScreen() {
 }
 
 function addDepartment() {
+  // Asks user for department name and inserts it into department table
   inquirer
     .prompt([
       {
@@ -176,6 +182,8 @@ function addDepartment() {
 }
 
 function addRole() {
+  // Asks user for role name, salary for this role, and department where this role will belong to. The department list is taken from existing values in the department table.
+  // Sets up some global variables to be referenced and used later in the function.
   var newRole = [];
   var newSalary = [];
   var end = [];
@@ -208,6 +216,7 @@ function addRole() {
             console.log(err);
             return;
           }
+          // Takes result from db query and converts it over to usable array for inquirer to display as options
           let array = Object.values(JSON.parse(JSON.stringify(result)));
           let options = array[0].choices;
           const myOptions = JSON.stringify(options);
@@ -226,6 +235,7 @@ function addRole() {
             .then((response) => {
               let dept = response.department;
               db.query(
+                // Takes user inut and matches it to value in database.
                 `SELECT id FROM department WHERE department_name = "${dept}";`,
                 (err, result) => {
                   if (err) {
@@ -234,8 +244,8 @@ function addRole() {
                   }
                   let array = Object.values(JSON.parse(JSON.stringify(result)));
                   end = array[0].id;
-                  console.log(end);
                   db.query(
+                    // creates new role with needed values
                     `INSERT INTO current_role (title, salary, department_id) VALUES ("${newRole}", ${newSalary}, ${end});`,
                     (err, result) => {
                       if (err) {
@@ -255,6 +265,9 @@ function addRole() {
 }
 
 function addEmployee() {
+  // This function adds a new employee. It asks the user for employee first name, last name, role and manager.
+  // Role and manager are existing values loaded from current_role and employee tables, respectively.
+  // Setting up of global values to be referenced and used later in function.
   var firstN = [];
   var lastN = [];
   var finish = [];
@@ -301,10 +314,9 @@ function addEmployee() {
               },
             ])
             .then((response) => {
+              // Manager name is composed of first name and last name. It needs to be seperated to be able to matched to id and used to assign manager_id
               let employeesNames = response.manager.split(" ");
-              console.log(employeesNames);
               let firstName = employeesNames[0];
-              console.log(firstName);
               db.query(
                 `SELECT id FROM employee WHERE first_name = "${firstName}";`,
                 (err, result) => {
@@ -314,8 +326,7 @@ function addEmployee() {
                   }
                   let array = Object.values(JSON.parse(JSON.stringify(result)));
                   end = array[0].id;
-                  console.log(end);
-                  // TODO : ADD look for role here!!!!!!!!!!!!!!!!!!!!!!
+                  // Populate role values for inquirer options
                   db.query(
                     `SELECT GROUP_CONCAT(title) as choices FROM current_role;`,
                     (err, result) => {
@@ -355,6 +366,7 @@ function addEmployee() {
                               );
                               let finish = array[0].id;
                               db.query(
+                                // Final set up of the employee taking all values from previous request in function. Sets up the new employee.
                                 `INSERT INTO employee (first_name, last_name,current_role_id, manager_id) VALUES ("${firstN}", "${lastN}",${finish}, ${end});`,
                                 (err, result) => {
                                   if (err) {
@@ -381,16 +393,20 @@ function addEmployee() {
 }
 
 function updateEmployee() {
+  // This function takes existing employee and modifies role value. List of employees is taken from existing values found in employee table
+  // Set up of global values to be used later in function
   var employee = [];
   var newRole = [];
   var finish = 0;
   db.query(
+    // db query to obtain list of employees currently in employee table, joining their first and last names.
     `SELECT GROUP_Concat(first_name, ' ', last_name) AS choices FROM employee ORDER BY first_name;`,
     (err, result) => {
       if (err) {
         console.log(err);
         return;
       }
+      // Converts output from mysql2 to array usable by inquirer
       let array = Object.values(JSON.parse(JSON.stringify(result)));
       let options = array[0].choices;
       const myOptions = JSON.stringify(options);
@@ -409,12 +425,14 @@ function updateEmployee() {
         .then((response) => {
           employee = response.employee_name;
           db.query(
+            // db query to pull values in current_role table to be displayed as options in inquirer 
             `SELECT GROUP_CONCAT(title) as choices FROM current_role;`,
             (err, result) => {
               if (err) {
                 console.log(err);
                 return;
               }
+              // Converts result of db query into array usable by inquirer
               let array = Object.values(JSON.parse(JSON.stringify(result)));
               let options = array[0].choices;
               const myOptions = JSON.stringify(options);
@@ -432,11 +450,8 @@ function updateEmployee() {
                 ])
                 .then((response) => {
                   newRole = response.role;
-                  console.log(newRole);
                   let employeesNames = employee.split(" ");
-                  console.log(employeesNames);
                   let firstName = employeesNames[0];
-                  console.log(firstName);
 
                   // Takes id from matching role value
                   db.query(
@@ -450,8 +465,8 @@ function updateEmployee() {
                         JSON.parse(JSON.stringify(result))
                       );
                       finish = array[0].id;
-                      console.log(finish);
                       db.query(
+                        // Updates table using values obtained from user input
                         `UPDATE employee SET current_role_id = "${finish}" WHERE first_name = "${firstName}";`,
                         (err, result) => {
                           if (err) {
@@ -478,4 +493,4 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Save this code to paste later
+

@@ -1,5 +1,5 @@
 USE employee_db;
--- Use join to show the corresponding value for the foreign key id
+--  This seeds data into the tables with example data. Inspired by a show I like to watch
 INSERT INTO department (department_name)
 VALUES ("Field Ops"),
         ("Owner"),

@@ -1,4 +1,5 @@
-
+-- This file contains sample queries to run in mysql
+-- DO NOT RUN THIS FILE BY ITSELF. IT WILL MODIFY CONTENTS OF TABLES
 -- Show employee joined with role
 SELECT
 employee.first_name, employee.last_name,

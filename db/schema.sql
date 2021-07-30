@@ -1,3 +1,4 @@
+-- This file sets up the database and 3 base tables needed for db to function
 DROP DATABASE IF EXISTS employee_db;
 CREATE DATABASE employee_db;
 
