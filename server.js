@@ -86,7 +86,7 @@ function nextOperation(choice) {
       console.log("You have chosen to view all employees.");
       //  Show employee table
       db.query(
-        `SELECT employee.first_name AS First, employee.last_name AS Last, current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department FROM employee JOIN current_role ON employee.current_role_id = current_role.id JOIN department ON current_role.department_id = department.id;`,
+        `SELECT employee.first_name AS First, employee.last_name AS Last, current_role.title AS Title, current_role.salary AS Salary, department.department_name AS Department, CONCAT(manager.first_name, " ", manager.last_name) AS Manager FROM employee JOIN current_role ON employee.current_role_id = current_role.id JOIN department ON current_role.department_id = department.id LEFT JOIN employee Manager ON manager.id = employee.manager_id;`,
         (err, rows) => {
           if (err) {
             console.log(err.message);
