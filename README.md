@@ -2,7 +2,7 @@
 
   ## Description:
 
-    This is a command line prompt that shows the user an employee database. Lists of departments, roles and employees can all be queried and displayed. New departments, roles and employees can be added. In addition, employees can have their roles updated. This updates the database found in mysql in real time and can be accessed later, showing the updates. 
+This is a command line prompt that shows the user an employee database. Lists of departments, roles and employees can all be queried and displayed. New departments, roles and employees can be added. In addition, employees can have their roles updated. This updates the database found in mysql in real time and can be accessed later, showing the updates. 
 
   ## Table of Contents:
   * [Description](#Description)
